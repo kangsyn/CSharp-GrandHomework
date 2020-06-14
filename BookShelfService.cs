@@ -202,17 +202,11 @@ namespace Library
             }
         }
 
-        public static void ReNewLending(Book book, string newDate)//续借新书，需要重写
+        public static void ReNewLending(Book book, string newDate)//续借新书
         {
-            if (Regex.IsMatch(newDate, @"[2020-2030]\s[1-12]\s[1-30]"))//为方便起见，暂时将日数设为30
-            {
-                book.AppointedTime = newDate;
-                UpdateBook(book);
-            }
-            else
-            {
-                MessageBox.Show("没有输入有效的日期，正确的格式例：“2020 7 1”！", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+            book.AppointedTime = time;
+            //book.Appointers.Add(client);
+            SetBookState(book, "已被借阅", client);
         }
         
         public static void ReturnBooks(Book book, Client client)//还书
@@ -226,17 +220,11 @@ namespace Library
             SetBookState(book, "可正常使用", client);
         }
 
-        public static void AppointBook(Book book, Client client, string time)//预约，需要重写
+        public static void AppointBook(Book book, Client client, string time)//预约
         {
-            if (Regex.IsMatch(time, @"[2][0][2][0-1]\s[1-9]\s[1-9]") || Regex.IsMatch(time, @"[2][0][2][0-1]\s[1-9][0-2]\s[1-9]") || Regex.IsMatch(time, @"[2][0][2][0-1]\s[1-9]\s[1-9][0-9]") || Regex.IsMatch(time, @"[2][0][2][0-1]\s[1-9][0-2]\s[1-9][0-9]"))//判断时间格式
-            {
-                book.AppointedTime = time;               
-                SetBookState(book, "已被预约", client);
-            }
-            else
-            {
-                MessageBox.Show("没有输入有效的日期，正确的格式例：“2020 7 1”！", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+            book.AppointedTime = time;
+            //book.Appointers.Add(client);
+            SetBookState(book, "已被预约", client);
         }
         
         public static void LendBook(Book book, Client client)//借阅
