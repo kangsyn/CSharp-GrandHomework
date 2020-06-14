@@ -36,6 +36,7 @@ namespace Library
             ClientName = "";
             Recommend = 0;
             Sort = "";
+            Appointers = new List<Client>();
         }
         public Book(string name, string author,string description) : this()
         {
