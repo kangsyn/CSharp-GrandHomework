@@ -38,9 +38,9 @@ namespace Library
                 List<Book> Books1 = new List<Book>() {
                     new Book() { BookId = "1", Name = "毛泽东选集", BookShelfId = "1",
                     State = "可正常使用", Description = "毛泽东所写的一本书。", Recommend = 10, Author = "毛泽东", AppointedTime = null, ClientName = null, Sort = "文学" },
-                    new Book() { BookId = "2", Name = "毛泽东选集二", BookShelfId = "1", State = "已被借阅", Description = "毛泽东所写的一本书。", Recommend = 15, Author = "毛泽东", AppointedTime = null, ClientName = "管理员", Sort = "文学" },
-                    new Book() { BookId = "3", Name = "毛泽东选集三", BookShelfId = "1", State = "已被借阅", Description = "毛泽东所写的一本书。", Recommend = 15, Author = "毛泽东", AppointedTime = null, ClientName = "管理员", Sort = "文学" },
-                    new Book() { BookId = "4", Name = "毛泽东选集四", BookShelfId = "1", State = "已被预约", Description = "毛泽东所写的一本书。", Recommend = 13, Author = "毛泽东", AppointedTime = "2020 8 1", ClientName = "管理员", Sort = "文学" }
+                    new Book() { BookId = "2", Name = "毛泽东选集二", BookShelfId = "1", State = "已被借阅", Description = "毛泽东所写的一本书。", Recommend = 15, Author = "毛泽东", AppointedTime = "2020年8月1日", ClientName = "管理员", Sort = "文学" },
+                    new Book() { BookId = "3", Name = "毛泽东选集三", BookShelfId = "1", State = "已被借阅", Description = "毛泽东所写的一本书。", Recommend = 15, Author = "毛泽东", AppointedTime = "2020年8月1日", ClientName = "管理员", Sort = "文学" },
+                    new Book() { BookId = "4", Name = "毛泽东选集四", BookShelfId = "1", State = "已被预约", Description = "毛泽东所写的一本书。", Recommend = 13, Author = "毛泽东", AppointedTime = "2020年8月1日", ClientName = "管理员", Sort = "文学" }
                 };
                 foreach (var book in Books1)
                 {
@@ -52,8 +52,8 @@ namespace Library
                 List<Book> Books2 = new List<Book>() {
                     new Book() { BookId = "5", Name = "C#编程", BookShelfId = "2",
                     State = "可正常使用", Description = "C#编程指南。", Recommend = 14, Author = "佚名", AppointedTime = null, ClientName = null, Sort = "C#" },
-                    new Book() { BookId = "6", Name = "JAVA编程指南", BookShelfId = "2", State = "已被借阅", Description = "JAVA编程指南。", Recommend = 12, Author = "佚名", AppointedTime = null, ClientName = "Admin", Sort = "JAVA" },
-                    new Book() { BookId = "7", Name = "C++编程指南", BookShelfId = "2", State = "已被预约", Description = "C++编程指南。", Recommend = 13, Author = "佚名", AppointedTime = "2020 9 1", ClientName = "Admin" , Sort = "C++"}
+                    new Book() { BookId = "6", Name = "JAVA编程指南", BookShelfId = "2", State = "已被借阅", Description = "JAVA编程指南。", Recommend = 12, Author = "佚名", AppointedTime = "2020年8月1日", ClientName = "Admin", Sort = "JAVA" },
+                    new Book() { BookId = "7", Name = "C++编程指南", BookShelfId = "2", State = "已被预约", Description = "C++编程指南。", Recommend = 13, Author = "佚名", AppointedTime = "2020年8月1日", ClientName = "Admin" , Sort = "C++"}
                 };
                 foreach (var book in Books2)
                 {
@@ -77,7 +77,7 @@ namespace Library
                 MessageBox.Show("请选择一本书进行操作！");
                 return;
             }
-            BookShelfService.ReturnBooks(book, currentClient);//问题
+            BookShelfService.ReturnBooks(book, currentClient);
             lendBooks = new List<Book>();
             lendBindingSource.DataSource = lendBooks;
             lendBooks = BookShelfService.GetAllLentBooks(currentClient);
@@ -149,9 +149,47 @@ namespace Library
             booksBindingSource.DataSource = Books;
         }
 
-        private void renewButton_Click(object sender, EventArgs e)//续借，未完成
+        private void renewButton_Click(object sender, EventArgs e)//续借，完成
         {
-
+            Book book = lendBindingSource.Current as Book;
+            if (book == null)
+            {
+                MessageBox.Show("请选择一本书进行操作！");
+                return;
+            }
+            else
+            {
+                if (yearComboBox.Text != "" && monthComboBox.Text != "" && dayComboBox.Text != "")//monthComboBox之前打快了打成了monthhComboBox
+                {
+                    string year = yearComboBox.Text;
+                    string month = monthComboBox.Text;
+                    string day = dayComboBox.Text;
+                    string Time = year + "年" + month + "月" + day + "日";
+                    MessageBox.Show(Time);
+                    /*foreach(var c in book.Appointers)
+                    {
+                        if (c.Name == currentClient.Name)
+                        {
+                            book.Appointers.Remove(c);
+                        }
+                    }*/
+                    BookShelfService.ReNewLending(book,currentClient,Time);
+                }
+                else
+                {
+                    MessageBox.Show("没有输入正确的日期！", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            lendBooks = new List<Book>();
+            lendBindingSource.DataSource = lendBooks;
+            lendBooks = BookShelfService.GetAllLentBooks(currentClient);
+            lendBindingSource.ResetBindings(false);
+            lendBindingSource.DataSource = lendBooks;
+            Books = new List<Book>();
+            booksBindingSource.DataSource = Books;
+            Books = BookShelfService.AllBooks();
+            booksBindingSource.ResetBindings(false);
+            booksBindingSource.DataSource = Books;
         }
 
         private void searchButton_Click(object sender, EventArgs e)//查询，完成
