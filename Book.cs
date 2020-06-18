@@ -21,7 +21,7 @@ namespace Library
         //[ForeignKey("BookShelfId")]
         public string BookShelfId { get; set; }//所属书架号，自动识别为外键
         public string Sort { get; set; }//分类
-        public List<Client> Appointers { get; set; }//预约人
+        public List<String> Appointers { get; set; }//预约人的名字
         public string Appoint { get; set; }//预约情况，显示名字和序号
         //public BookShelf BookShelf { get; set; }//多对一关联
 
@@ -36,7 +36,7 @@ namespace Library
             ClientName = "";
             Recommend = 0;
             Sort = "";
-            Appointers = new List<Client>();
+            Appointers = new List<String>();
         }
         public Book(string name, string author,string description) : this()
         {
@@ -78,7 +78,7 @@ namespace Library
         {
             foreach(var c in Appointers)
             {
-                Appoint = Appoint + c.Id + " " + c.Name;
+                Appoint = Appoint + Appointers.IndexOf(c) + " " + c + " ";
             }
         }
     }
