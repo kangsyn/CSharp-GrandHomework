@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +21,6 @@ namespace Library
        public static IQueryable<BookShelf> AllShelves(BookShelfContext db)
         {
             return db.BookShelves.Include(o => o.Books)
-                //.Include("Books")
                 ;
         }
 
@@ -46,13 +45,6 @@ namespace Library
             }
         }
 
-        /*public static BookShelf GetBookShelfBySort(string sort)//按分类取得特定的书架
-        {
-            using (var db = new BookShelfContext())
-            {
-                return AllShelves(db).FirstOrDefault(o => o.Sort == sort);
-            }
-        }*/
         
         public static BookShelf AddBookShelf(BookShelf shelf)//添加新的书架
         {
@@ -60,10 +52,7 @@ namespace Library
             {
                 using (var db = new BookShelfContext())
                 {
-                    //MessageBox.Show(shelf.Sort + shelf.Books[0].Name, "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //MessageBox.Show(shelf.Sort + shelf.Books[1].Name, "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     db.BookShelves.Add(shelf);
-                    //MessageBox.Show(shelf.Sort + shelf.Books[2].Name, "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     db.SaveChanges();
                     MessageBox.Show("已成功添加书架！", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -76,7 +65,7 @@ namespace Library
             }
         }
 
-        public static void DeleteBookShelf(string id)//删除书架
+        public static void RemoveBookShelf(string id)
         {
             try
             {
@@ -85,32 +74,33 @@ namespace Library
                     var shelf = db.BookShelves.Include("Books").Where(o => o.BookShelfId == id).FirstOrDefault();
                     db.BookShelves.Remove(shelf);
                     db.SaveChanges();
+                    ClearBooks();
                 }
             }
             catch (Exception e)
             {
-                //TODO 需要更加错误类型返回不同错误信息
                 MessageBox.Show("删除书架错误！", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 throw new ApplicationException($"删除书架错误!");
             }
         }
 
-       /* public static void AddBook(Book book)//增加新书，现已改为直接在书架中进行
+        private static void ClearBooks()
         {
             try
             {
                 using (var db = new BookShelfContext())
                 {
-                    db.Books.Add(book);
+                    var oldBooks = db.Books.Where(book => book.BookShelfId == null);
+                    db.Books.RemoveRange(oldBooks);
                     db.SaveChanges();
                 }
             }
             catch (Exception e)
             {
-                MessageBox.Show("添加新书错误！", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                throw new ApplicationException($"添加新书错误!");
+                MessageBox.Show("删除书架错误！", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                throw new ApplicationException($"删除书架错误!");
             }
-        }*/
+        }
 
         public static List<Book> AllBooks()//取得所有的书
         {
@@ -127,23 +117,21 @@ namespace Library
             {
                 var oldBooks = db.Books.Where(book => book.BookShelfId == bookShelfId);
                 db.Books.RemoveRange(oldBooks);
-                MessageBox.Show(BookShelfService.AllBooks().Count + "" + "2");
                 db.SaveChanges();
             }
         }
 
-        private static void RemoveBooks(string bookId)//删除书籍(对单本书进行操作)
+        public static void RemoveBooks(string bookId)//删除书籍(对单本书进行操作)
         {
             using (var db = new BookShelfContext())
             {
                 var oldBooks = db.Books.Where(book => book.BookId == bookId);
                 db.Books.RemoveRange(oldBooks);
-                MessageBox.Show(BookShelfService.AllBooks().Count + "" + "2");
                 db.SaveChanges();
             }
         }
 
-        public static void UpdateShelf(BookShelf newBookShelf)//更新数据库内的书架,有问题
+        public static void UpdateShelf(BookShelf newBookShelf)//更新数据库内的书架
         {
             RemoveBooksFromShelf(newBookShelf.BookShelfId);
             using (var db = new BookShelfContext())
@@ -157,7 +145,6 @@ namespace Library
         public static void UpdateBook(Book newBook)//更新数据库内的书籍
         {
             RemoveBooks(newBook.BookId);
-            //MessageBox.Show(BookShelfService.AllBooks().Count + "" + "3");
             using (var db = new BookShelfContext())
             {
                 db.Entry(newBook).State = EntityState.Modified;
@@ -166,7 +153,7 @@ namespace Library
             }
         }
 
-        public static void SetBookState(Book book, string state, Client client)//设置书籍的当前状态，包括“可正常使用”、“已被借阅”、“已被预约”
+        public static void SetBookState(Book book, string state, Client client)//设置书籍的当前状态，包括“可正常使用”、“已被借阅”
         {
             if (state == "可正常使用")
             {
@@ -177,13 +164,7 @@ namespace Library
                 book.ClientName = client.Name;
             }
             book.State = state;
-            //MessageBox.Show(BookShelfService.AllBooks().Count + "" + "1");
-            using (var db = new BookShelfContext())
-            {
-                BookShelf bookShelf = AllShelves(db).FirstOrDefault(o => o.BookShelfId == book.BookShelfId);
-                UpdateBook(book);
-            }
-            //MessageBox.Show(BookShelfService.AllBooks().Count + "" + "4");
+            UpdateBook(book);
         }
 
         public static List<Book> GetAllLentBooks(Client client)//取得所有已借阅的书
@@ -196,7 +177,6 @@ namespace Library
 
         public static List<Book> GetAllAppointedBooks(Client client)//取得所有预约的书
         {
-            //MessageBox.Show(client.Name);
             using (var db = new BookShelfContext())
             {
                 List<Book> appointed = new List<Book>();
@@ -207,7 +187,6 @@ namespace Library
                                 appointed.Add(b);
                     }
                 }
-                //MessageBox.Show(appointed.Count()+"");
                 return appointed;
             }
         }
@@ -218,7 +197,6 @@ namespace Library
             int Month = DateTime.Now.Month;
             int Day = DateTime.Now.Day;
             int Days = DateTime.DaysInMonth(Year, Month);
-            //MessageBox.Show(Year + " " + Month + " " + Day + " " + "|" + year + " " + month + " " + day + " "+Days);
             bool flag = true;
             if (Convert.ToInt32(year) < Year)
             {
@@ -245,8 +223,9 @@ namespace Library
             if(flag == true)
             {
                 book.LendTime = year + "年" + month + "月" + day + "日";
-                //book.Appointers.Add(client);
+                book.reNewNum++;
                 SetBookState(book, "已被借阅", client);
+                MessageBox.Show("已成功续借！");
             }
             if(flag == false)
             {
@@ -256,6 +235,7 @@ namespace Library
         
         public static void ReturnBooks(Book book, Client client)//还书
         {
+            book.reNewNum = 0;
             if(book.Appointers == "" || book.Appointers == null)
             {
                 SetBookState(book, "可正常使用", client);
@@ -264,7 +244,6 @@ namespace Library
             {
                 int i = book.Appointers.IndexOf(" ");
                 string c = book.Appointers.Substring(0, i);
-                //MessageBox.Show(c);
                 book.Appointers = book.Appointers.Replace(c + " ", "");
                 Client newClient = ClientService.AllClients().FirstOrDefault(o => o.Name == c);
                 int Year = DateTime.Now.Year;
@@ -279,21 +258,85 @@ namespace Library
         {
             book.Appointers = book.Appointers.Replace(client.Name+" ", "");
             UpdateBook(book);
+            MessageBox.Show("成功取消预约！");
         }
 
-        public static void AppointBook(Book book, Client client, string time)//预约
+        public static void AppointBook(Book book, Client client)//预约
         {
-            book.AppointedTime = time;
-            //book.Appointers.Add(client);
-            SetBookState(book, "已被预约", client);
+            if(book.State == "可正常使用")
+            {
+                MessageBox.Show("该书可正常使用，可以直接借阅！");
+                return;
+            }
+            if (book.Appointers.Contains(client.Name))
+            {
+                MessageBox.Show("您已经预约过了！");
+                return;
+            }
+            if (book.ClientName == client.Name)
+            {
+                MessageBox.Show("您已经借阅了这本书！");
+                return;
+            }
+            if (book.Appointers.Length != 0)
+            {
+                book.Appointers = book.Appointers+" "+client.Name+" ";
+            }
+            else if(book.Appointers.Length == 0)
+            {
+                book.Appointers = client.Name;
+            }
+            UpdateBook(book);
+            MessageBox.Show("成功预约！");
         }
         
-        public static void LendBook(Book book, Client client)//借阅
+        public static void LendBook(Book book, Client client,string year,string month, string day)//借阅
         {
-            SetBookState(book, "可正常使用", client);
+            if(book.State == "已被借阅")
+            {
+                MessageBox.Show("该书已被借阅，请进行预约！");
+                return;
+            }
+            int Year = DateTime.Now.Year;
+            int Month = DateTime.Now.Month;
+            int Day = DateTime.Now.Day;
+            int Days = DateTime.DaysInMonth(Year, Month);
+            bool flag = true;
+            if (Convert.ToInt32(year) < Year)
+            {
+                flag = false;
+            }
+            else if (Convert.ToInt32(year) == Year)
+            {
+                if (Convert.ToInt32(month) < Month)
+                {
+                    flag = false;
+                }
+                else if (Convert.ToInt32(month) == Month)
+                {
+                    if (Convert.ToInt32(day) <= Day)
+                    {
+                        flag = false;
+                    }
+                }
+            }
+            if (Convert.ToInt32(day) > Days)
+            {
+                flag = false;
+            }
+            if (flag == true)
+            {
+                book.LendTime = year + "年" + month + "月" + day + "日";
+                SetBookState(book, "已被借阅", client);
+                MessageBox.Show("已成功借阅！");
+            }
+            if (flag == false)
+            {
+                MessageBox.Show("没有输入正确的日期！");
+            }
         }
-        
-        public static void Check(int year,int month, int day)//检测是否有书籍到期
+
+        public static void Check(int year,int month, int day)
         {
             using (var db = new BookShelfContext())
             {
