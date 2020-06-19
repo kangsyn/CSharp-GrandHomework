@@ -55,7 +55,6 @@ namespace Library
                 return;
             }
             currentClient = testClient;
-            //this.ShowDialog() = DialogResult.OK;
             this.Close();
         }
     }
