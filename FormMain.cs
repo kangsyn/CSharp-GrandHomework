@@ -13,14 +13,21 @@ namespace Library
     public partial class FormMain : Form
     {
         public Client currentClient { get; set; }
-        public Client administrator = new Client("管理员", "admin");
+        public Client administrator1 = new Client("管理员1", "admin");
+        public Client administrator2 = new Client("管理员2", "admin");
+        public Client administrator3 = new Client("管理员3", "admin");
         public List<Book> Books { get; set; }
         public List<Book> appointBooks { get; set; }
         public List<Book> lendBooks { get; set; }
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public int Day { get; set; }
         public FormMain()
         {
             InitializeComponent();
-            administrator.Id = "1";
+            administrator1.Id = "1";
+            administrator2.Id = "2";
+            administrator3.Id = "3";
             if(currentClient == null)
             {
                 this.signOutButton.Visible = false;
@@ -28,7 +35,9 @@ namespace Library
             }
             if (ClientService.AllClients().Count == 0)
             {
-                ClientService.AddAdministrator(administrator);
+                ClientService.AddAdministrator(administrator1);
+                ClientService.AddAdministrator(administrator2);
+                ClientService.AddAdministrator(administrator3);
             }
             this.manageButton.Visible = false;
             this.manageButton.Enabled = false;
@@ -37,8 +46,13 @@ namespace Library
                 Test.Test1();
                 Test.Test2();
             }      
-
-            
+            Year = DateTime.Now.Year;
+            Month = DateTime.Now.Month;
+            String time = DateTime.Now.ToLongDateString().ToString();
+            int m = time.IndexOf("月");
+            int d = time.IndexOf("日");
+            Day = DateTime.Now.Day;
+            BookShelfService.Check(Year, Month, Day);
             Books = BookShelfService.AllBooks();
             booksBindingSource.DataSource = Books;
             Query(1);
@@ -63,6 +77,7 @@ namespace Library
             Books = BookShelfService.AllBooks();
             booksBindingSource.ResetBindings(false);
             booksBindingSource.DataSource = Books;
+            Query(1);
         }
 
         private void signInButton_Click(object sender, EventArgs e)//登录，完成
@@ -122,6 +137,7 @@ namespace Library
             Books = BookShelfService.AllBooks();
             booksBindingSource.ResetBindings(false);
             booksBindingSource.DataSource = Books;
+            Query(1);
         }
 
         private void renewButton_Click(object sender, EventArgs e)//续借，完成
@@ -139,8 +155,7 @@ namespace Library
                     string year = yearComboBox.Text;
                     string month = monthComboBox.Text;
                     string day = dayComboBox.Text;
-                    string Time = year + "年" + month + "月" + day + "日";
-                    MessageBox.Show(Time);
+                    //MessageBox.Show(Time);
                     /*foreach(var c in book.Appointers)
                     {
                         if (c.Name == currentClient.Name)
@@ -148,7 +163,7 @@ namespace Library
                             book.Appointers.Remove(c);
                         }
                     }*/
-                    BookShelfService.ReNewLending(book,currentClient,Time);
+                    BookShelfService.ReNewLending(book,currentClient,year,month,day);
                 }
                 else
                 {
@@ -165,6 +180,7 @@ namespace Library
             Books = BookShelfService.AllBooks();
             booksBindingSource.ResetBindings(false);
             booksBindingSource.DataSource = Books;
+            Query(1);
         }
 
         private void searchButton_Click(object sender, EventArgs e)//查询，完成
