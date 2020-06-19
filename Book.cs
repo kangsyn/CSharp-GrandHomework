@@ -14,15 +14,15 @@ namespace Library
         public string Name { get; set; }//名字
         public string Author { get; set; }//作者
         public string State { get; set; }//状态
-        public string AppointedTime { get; set; }//预约的时间，也可表示到期的时间
+        public string LendTime { get; set; }//到期的时间
         public string Description { get; set; }//描述
         public string ClientName { get; set; }//使用人
         public int Recommend { get; set; }//推荐数，选择前4位的数推荐
         //[ForeignKey("BookShelfId")]
         public string BookShelfId { get; set; }//所属书架号，自动识别为外键
         public string Sort { get; set; }//分类
-        public List<String> Appointers { get; set; }//预约人的名字
-        public string Appoint { get; set; }//预约情况，显示名字和序号
+        public String Appointers { get; set; }//预约人
+        //public List<String> Appointers = new List<String>();//预约人
         //public BookShelf BookShelf { get; set; }//多对一关联
 
         public Book()
@@ -31,20 +31,26 @@ namespace Library
             Name = "";
             Author = "";
             State = "";
-            AppointedTime = "";
+            LendTime = "";
             Description = "";
             ClientName = "";
             Recommend = 0;
             Sort = "";
-            Appointers = new List<String>();
+            //Appointer = new Appointer();
         }
-        public Book(string name, string author,string description) : this()
+        public Book(string bookID,string name, string shelfID, string author,string description,string lend, string client, string sort,string appointers)
         {
-            this.Name = name;
-            this.Author = author;
+            BookId = bookID;
+            Name = name;
+            Author = author;
+            BookShelfId = shelfID;
+            LendTime = lend;
+            ClientName = client;
+            Sort = sort;
+            Appointers = appointers;
             //this.State = state;
             //this.AppointedTime = appointedTime;
-            this.Description = description;
+            Description = description;
             //this.ClientName = clientName;
             //this.Recommend = recommend;
         }
@@ -73,13 +79,6 @@ namespace Library
                 Recommend == book.Recommend && 
                 BookShelfId == book.BookShelfId;
 
-        }
-        public void setAppoint()//设置预约情况，显示名字和序号（也就是从Appointers列表里，挨个取元素，格式为“序号：用户名”+“ ”+“序号：用户名”。。。）
-        {
-            foreach(var c in Appointers)
-            {
-                Appoint = Appoint + Appointers.IndexOf(c) + " " + c + " ";
-            }
         }
     }
 }
