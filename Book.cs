@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Library
 {
@@ -22,8 +23,8 @@ namespace Library
         public string BookShelfId { get; set; }//所属书架号，自动识别为外键
         public string Sort { get; set; }//分类
         public String Appointers { get; set; }//预约人
-        //public List<String> Appointers = new List<String>();//预约人
-        //public BookShelf BookShelf { get; set; }//多对一关联
+        public int reNewNum { get; set; }//续借的次数
+        public string imagePath { get; set; }//图像路径
 
         public Book()
         {
