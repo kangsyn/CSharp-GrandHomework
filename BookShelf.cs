@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Xml.Serialization;
+using System.Windows.Forms;
 
 namespace Library
 {
@@ -14,22 +15,16 @@ namespace Library
     {
         [Key]
         public string BookShelfId { get; set; }//书架号，自动识别为主键
-        //public string Sort { get;set;}//分类
         public int Num { get; set; }//数量
-       //public string BookId { get; set; }
-        //[ForeignKey("BookId")]
         public List<Book> Books { get; set; }//一对多关联
 
         public BookShelf()
         {
-            //BookShelfId = Guid.NewGuid().ToString();
             Books = new List<Book>();
             Num = 0;
-            //Sort = "";
         }
         public BookShelf(List<Book> books, String sort):this()
         {
-            //this.Sort = sort;
             if(books != null)
             {
                 foreach(var book in books)
@@ -61,7 +56,6 @@ namespace Library
         {
             var hashCode = -531220479;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(BookShelfId);
-            //hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Sort);
             hashCode = hashCode * -1521134295 + Num.GetHashCode();
             return hashCode;
         }
