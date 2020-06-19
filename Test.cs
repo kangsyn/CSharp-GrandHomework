@@ -9,38 +9,48 @@ namespace Library
 {
     class Test
     {
+        static String administrator1 = ClientService.AllClients().FirstOrDefault(o => o.Id == "1").Name;
+        static String administrator2 = ClientService.AllClients().FirstOrDefault(o => o.Id == "2").Name;
+        static String administrator3 = ClientService.AllClients().FirstOrDefault(o => o.Id == "3").Name;
         public static void Test1()
         {
-            String administrator = ClientService.AllClients().FirstOrDefault(o => o.Id == "1").Name;
-            //MessageBox.Show(administrator);
+            //MessageBox.Show(administrator1);
+            //MessageBox.Show(administrator2);
             BookShelf test1 = new BookShelf();
-            Book book1 = new Book()
+            Book book1 = new Book("1","毛泽东选集一","1","毛泽东", "毛泽东所写的一本书。", null,null,"文学","")
             {
-                BookId = "1",
-                Name = "毛泽东选集",
-                BookShelfId = "1",
                 State = "可正常使用",
-                Description = "毛泽东所写的一本书。",
-                Recommend = 10,
-                Author = "毛泽东",
-                LendTime = null,
-                ClientName = null,
-                Sort = "文学"
+                Recommend = 10
             };
-            Book book2 = new Book() { BookId = "2", Name = "毛泽东选集二", BookShelfId = "1", State = "已被借阅", Description = "毛泽东所写的一本书。", Recommend = 15, Author = "毛泽东", LendTime = "2020年8月1日", ClientName = "管理员", Sort = "文学" };
-            //book1.Appointers.Add(administrator);
-            Book book3 = new Book() { BookId = "3", Name = "毛泽东选集三", BookShelfId = "1", State = "已被借阅", Description = "毛泽东所写的一本书。", Recommend = 15, Author = "毛泽东", LendTime = "2020年8月1日", ClientName = "管理员", Sort = "文学" };
-            Book book4 = new Book() { BookId = "4", Name = "毛泽东选集四", BookShelfId = "1", State = "已被预约", Description = "毛泽东所写的一本书。", Recommend = 13, Author = "毛泽东", LendTime = "2020年8月1日", ClientName = "管理员", Sort = "文学" };
+            Book book2 = new Book("2", "毛泽东选集二", "1", "毛泽东", "毛泽东所写的一本书。", "2020年8月1日", "管理员1", "文学",administrator2+" "+ administrator3+" ")
+            { 
+                State = "已被借阅",
+                Recommend = 15
+            };
+            //book2.Appointer = ClientService.transferIntoAppointer(administrator2, book2);
+            //book2.Appointers.Add(administrator2);           
+            Book book3 = new Book("3", "毛泽东选集三", "1", "毛泽东", "毛泽东所写的一本书。", "2020年8月1日", "管理员1", "文学",administrator2+" ") 
+            { 
+                State = "已被借阅", 
+                Recommend = 15
+            };
+            //book3.Appointer = ClientService.transferIntoAppointer(administrator2, book3);
+            //book3.Appointers.Add(administrator2);
+            Book book4 = new Book("4", "毛泽东选集四", "1", "毛泽东", "毛泽东所写的一本书。", "2020年8月1日", "管理员1", "文学",administrator2+" "+administrator3+" ") 
+            { 
+                State = "已被借阅",
+                Recommend = 13
+            };
+            //book4.Appointer = ClientService.transferIntoAppointer(administrator2, book4);
+            //book4.Appointers.Add(administrator2);
             List<Book> Books1 = new List<Book>()
             {
                 book1,book2,book3,book4
             };
             foreach (var book in Books1)
             {
-                //MessageBox.Show(book.Appointers.Count()+"");
-                book.Appointers.Add(administrator);
-                MessageBox.Show(book.Appointers.Count() + "");
-                book.setAppoint();
+                //MessageBox.Show(book.Name+book.Appointer.Count()+"");
+                //book.setAppoint();
                 test1.AddBook(book);
             }
             test1.BookShelfId = "1";
@@ -50,12 +60,29 @@ namespace Library
         public static void Test2()
         {
             BookShelf test2 = new BookShelf();
-            List<Book> Books2 = new List<Book>() {
-                    new Book() { BookId = "5", Name = "C#编程", BookShelfId = "2",
-                    State = "可正常使用", Description = "C#编程指南。", Recommend = 14, Author = "佚名", LendTime = null, ClientName = null, Sort = "C#" },
-                    new Book() { BookId = "6", Name = "JAVA编程指南", BookShelfId = "2", State = "已被借阅", Description = "JAVA编程指南。", Recommend = 12, Author = "佚名", LendTime = "2020年8月1日", ClientName = "Admin", Sort = "JAVA" },
-                    new Book() { BookId = "7", Name = "C++编程指南", BookShelfId = "2", State = "已被预约", Description = "C++编程指南。", Recommend = 13, Author = "佚名", LendTime = "2020年9月1日", ClientName = "Admin" , Sort = "C++"}
-                };
+            Book book1 = new Book("5", "C#编程", "2", "佚名", "C#编程指南。", null, null, "C#","")
+            {
+                State = "可正常使用",
+                Recommend = 14
+            };
+
+            Book book2 = new Book("6", "JAVA编程", "2", "佚名", "JAVA编程指南。", "2020年5月1日", "管理员2", "JAVA",administrator1+" ")
+            {
+                State = "已被借阅",
+                Recommend = 12
+            };
+            //book2.Appointer = ClientService.transferIntoAppointer(administrator1, book2);
+            //book2.Appointers.Add(administrator2);           
+            Book book3 = new Book("7", "C++编程", "2", "佚名", "C++编程指南。", "2020年9月1日", "管理员2", "C++",administrator1+" "+administrator3+" ")
+            {
+                State = "已被借阅",
+                Recommend = 13
+            };
+            //book3.Appointer = ClientService.transferIntoAppointer(administrator1, book3);
+            List<Book> Books2 = new List<Book>()
+            {
+                book1,book2,book3
+            };
             foreach (var book in Books2)
             {
                 test2.AddBook(book);
