@@ -13,7 +13,6 @@ namespace Library
         public BookShelfContext() : base("LibraryDataBase")
         {
             Database.SetInitializer(new DropCreateDatabaseIfModelChanges<BookShelfContext>());
-            //MessageBox.Show("打开数据库！", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         public DbSet<BookShelf> BookShelves { get; set; }
         public DbSet<Book> Books { get; set; }
