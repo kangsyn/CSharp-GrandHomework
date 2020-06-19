@@ -10,7 +10,6 @@ using System.Windows.Forms;
 namespace Library
 {
     public class Book { 
-        //[Key]
         public string BookId { get; set; }//书号，自动识别为主键
         public string Name { get; set; }//名字
         public string Author { get; set; }//作者
@@ -19,7 +18,6 @@ namespace Library
         public string Description { get; set; }//描述
         public string ClientName { get; set; }//使用人
         public int Recommend { get; set; }//推荐数，选择前4位的数推荐
-        //[ForeignKey("BookShelfId")]
         public string BookShelfId { get; set; }//所属书架号，自动识别为外键
         public string Sort { get; set; }//分类
         public String Appointers { get; set; }//预约人
@@ -28,7 +26,6 @@ namespace Library
 
         public Book()
         {
-            //BookId = Guid.NewGuid().ToString();
             Name = "";
             Author = "";
             State = "";
@@ -37,7 +34,6 @@ namespace Library
             ClientName = "";
             Recommend = 0;
             Sort = "";
-            //Appointer = new Appointer();
         }
         public Book(string bookID,string name, string shelfID, string author,string description,string lend, string client, string sort,string appointers)
         {
@@ -49,11 +45,7 @@ namespace Library
             ClientName = client;
             Sort = sort;
             Appointers = appointers;
-            //this.State = state;
-            //this.AppointedTime = appointedTime;
             Description = description;
-            //this.ClientName = clientName;
-            //this.Recommend = recommend;
         }
         public override int GetHashCode()
         {
