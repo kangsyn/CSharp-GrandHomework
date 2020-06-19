@@ -13,9 +13,10 @@ namespace Library
     public partial class FormMain : Form
     {
         public Client currentClient { get; set; }
-        public Client administrator1 = new Client("管理员1", "admin");
-        public Client administrator2 = new Client("管理员2", "admin");
-        public Client administrator3 = new Client("管理员3", "admin");
+        public Client administrator = new Client("管理员", "admin");
+        public Client user1 = new Client("涂珈玮", "TJW");
+        public Client user2 = new Client("康盛尧", "KSY");
+        public Client user3 = new Client("李梦凡", "LMF");
         public List<Book> Books { get; set; }
         public List<Book> appointBooks { get; set; }
         public List<Book> lendBooks { get; set; }
@@ -25,19 +26,21 @@ namespace Library
         public FormMain()
         {
             InitializeComponent();
-            administrator1.Id = "1";
-            administrator2.Id = "2";
-            administrator3.Id = "3";
-            if(currentClient == null)
+            administrator.Id = "1";
+            user1.Id = "2";
+            user2.Id = "3";
+            user3.Id = "4";
+            if (currentClient == null)
             {
                 this.signOutButton.Visible = false;
                 this.signOutButton.Enabled = false;
             }
             if (ClientService.AllClients().Count == 0)
             {
-                ClientService.AddAdministrator(administrator1);
-                ClientService.AddAdministrator(administrator2);
-                ClientService.AddAdministrator(administrator3);
+                ClientService.AddAdministrator(administrator);
+                ClientService.AddAdministrator(user1);
+                ClientService.AddAdministrator(user2);
+                ClientService.AddAdministrator(user3);
             }
             this.manageButton.Visible = false;
             this.manageButton.Enabled = false;
@@ -45,7 +48,7 @@ namespace Library
             {
                 Test.Test1();
                 Test.Test2();
-            }      
+            }
             Year = DateTime.Now.Year;
             Month = DateTime.Now.Month;
             String time = DateTime.Now.ToLongDateString().ToString();
@@ -66,7 +69,7 @@ namespace Library
                 MessageBox.Show("请选择一本书进行操作！");
                 return;
             }
-            BookShelfService.ReturnBooks(book, currentClient);
+            BookShelfService.ReturnBooks(book, currentClient);//问题
             lendBooks = new List<Book>();
             lendBindingSource.DataSource = lendBooks;
             lendBooks = BookShelfService.GetAllLentBooks(currentClient);
@@ -102,7 +105,6 @@ namespace Library
                         this.manageButton.Visible = true;
                         this.manageButton.Enabled = true;
                     }
-
                     appointBooks = BookShelfService.GetAllAppointedBooks(currentClient);
                     lendBooks = BookShelfService.GetAllLentBooks(currentClient);
                     appointBindingSource.DataSource = appointBooks;
@@ -155,15 +157,14 @@ namespace Library
                     string year = yearComboBox.Text;
                     string month = monthComboBox.Text;
                     string day = dayComboBox.Text;
-                    //MessageBox.Show(Time);
-                    /*foreach(var c in book.Appointers)
+                    if(book.reNewNum < 3)
                     {
-                        if (c.Name == currentClient.Name)
-                        {
-                            book.Appointers.Remove(c);
-                        }
-                    }*/
-                    BookShelfService.ReNewLending(book,currentClient,year,month,day);
+                        BookShelfService.ReNewLending(book, currentClient, year, month, day);
+                    }
+                    else
+                    {
+                        MessageBox.Show("该书续借次数太多，不允许继续续借！");
+                    }
                 }
                 else
                 {
@@ -242,20 +243,33 @@ namespace Library
 
         private void intoDetailButton_Click(object sender, EventArgs e)//查看细节,完成
         {
+            if(currentClient == null)
+            {
+                MessageBox.Show("请登录后再进行此操作！");
+                return;
+            }
             Book book = booksBindingSource.Current as Book;
             FormBookDetail formBookDetail = new FormBookDetail(book, currentClient, 1);
             if (formBookDetail.ShowDialog() == DialogResult.OK)
             {
                 Query(1);
+                appointBooks = BookShelfService.GetAllAppointedBooks(currentClient);
+                lendBooks = BookShelfService.GetAllLentBooks(currentClient);
+                appointBindingSource.DataSource = appointBooks;
+                lendBindingSource.DataSource = lendBooks;
             }
         }
 
         private void manageButton_Click(object sender, EventArgs e)//图书管理，完成
         {
-            FormShelf formShelf = new FormShelf();
+            FormShelf formShelf = new FormShelf(currentClient);
             if (formShelf.ShowDialog() == DialogResult.OK)
             {
                 Query(1);
+                appointBooks = BookShelfService.GetAllAppointedBooks(currentClient);
+                lendBooks = BookShelfService.GetAllLentBooks(currentClient);
+                appointBindingSource.DataSource = appointBooks;
+                lendBindingSource.DataSource = lendBooks;
             }
         }
 
@@ -278,6 +292,12 @@ namespace Library
             this.registerButton.Enabled = true;
             this.manageButton.Visible = false;
             this.manageButton.Enabled = false;
+            lendBooks = new List<Book>();
+            lendBindingSource.DataSource = lendBooks;
+            lendBindingSource.ResetBindings(false);
+            appointBooks = new List<Book>();
+            appointBindingSource.DataSource = appointBooks;
+            appointBindingSource.ResetBindings(false);
         }
 
         private void Query(int i)//排序方法，i表示具体的排序规则，完成
@@ -327,13 +347,19 @@ namespace Library
                 switch (i)
                 {
                     case 1://按书号查询
-                        searchBooks.Add(BookShelfService.AllBooks().FirstOrDefault(o => o.BookId == key));
+                        foreach (var book in BookShelfService.AllBooks().Where(o => o.BookId.Contains(key) == true))
+                        {
+                            searchBooks.Add(book);
+                        }
                         break;
                     case 2://书名
-                        searchBooks.Add(BookShelfService.AllBooks().FirstOrDefault(o => o.Name == key));
+                        foreach (var book in BookShelfService.AllBooks().Where(o => o.Name.Contains(key) == true))
+                        {
+                            searchBooks.Add(book);
+                        }
                         break;
                     case 3://作者
-                        foreach(var book in BookShelfService.AllBooks().Where(o => o.Author == key))
+                        foreach(var book in BookShelfService.AllBooks().Where(o => o.Author.Contains(key)==true))
                         {
                             searchBooks.Add(book);
                         }
@@ -357,17 +383,5 @@ namespace Library
             }
         }
 
-        /*private void resetBind()//重设数据绑定，基本完成，不确定是否有用
-        {
-            Books = BookShelfService.AllBooks();
-            appointBooks = BookShelfService.GetAllAppointedBooks(currentClient);
-            lendBooks = BookShelfService.GetAllLentBooks(currentClient);
-            appointBindingSource.DataSource = appointBooks;
-            appointBindingSource.ResetBindings(false);
-            lendBindingSource.DataSource = lendBooks;
-            lendBindingSource.ResetBindings(false);
-            booksBindingSource.DataSource = Books;
-            booksBindingSource.ResetBindings(false);
-        }*/
     }
 }
