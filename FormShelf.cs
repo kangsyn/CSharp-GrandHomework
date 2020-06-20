@@ -163,6 +163,7 @@ namespace Library
 
         private void managebySortButton_Click(object sender, EventArgs e)//改为按分类管理图书
         {
+                    isNormal = false;
             shelfBindingSource.DataSource = BookShelfService.GetAllShelfs();
             bookBindingSource.DataMember = null;
             bookBindingSource.DataSource = BookShelfService.AllBooks();
@@ -170,6 +171,7 @@ namespace Library
 
         private void refreshButton_Click(object sender, EventArgs e)//将管理方式改为按书架
         {
+                    isNormal = true;
             shelfBindingSource.DataSource = BookShelfService.GetAllShelfs();
             bookBindingSource.DataSource = shelfBindingSource;
             bookBindingSource.DataMember = "Books";
