@@ -193,10 +193,13 @@ namespace Library
 
         public static void ReNewLending(Book book, Client client, string year,string month,string day)//续借新书
         {
-            int Year = DateTime.Now.Year;
-            int Month = DateTime.Now.Month;
-            int Day = DateTime.Now.Day;
-            int Days = DateTime.DaysInMonth(Year, Month);
+            int y = book.LendTime.IndexOf("年");
+            int m = book.LendTime.IndexOf("月");
+            int d = book.LendTime.IndexOf("日");
+            int Year = Convert.ToInt32(book.LendTime.Substring(0, y));
+            int Month = Convert.ToInt32(book.LendTime.Substring(y+1, m-y-1));
+            int Day = Convert.ToInt32(book.LendTime.Substring(m+1, d-m-1));
+            int Days = DateTime.DaysInMonth(Convert.ToInt32(year),Convert.ToInt32(month));
             bool flag = true;
             if (Convert.ToInt32(year) < Year)
             {
