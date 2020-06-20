@@ -60,7 +60,10 @@ namespace Library
             this.currentBook = book;
             if(book.imagePath != null)
             {
-                this.discoverPictureBox.Image = Image.FromFile(book.imagePath);
+                if (File.Exists(book.imagePath))
+                {
+                    this.discoverPictureBox.Image = Image.FromFile(book.imagePath);
+                }
             }
             if (flag == 1)//从主界面进入则不能更改内容，加入书架按钮也被隐藏
             {
@@ -195,8 +198,14 @@ namespace Library
         {
                 this.openFileDialog.ShowDialog();
                 path = openFileDialog.FileName;
+            if(path.Contains(".jpg") || path.Contains(".png"))
+            {
                 discoverPictureBox.Image = Image.FromFile(path);
-                MessageBox.Show(path);
+            }
+            else
+            {
+                MessageBox.Show("请选择图片文件！");
+            }
         }
     }
 }
